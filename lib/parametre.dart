@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,12 +11,14 @@ class Parametre extends StatefulWidget {
 }
 
 class _ParametreState extends State<Parametre> {
+  User user = User('', '', '', '');
   Future<User> getShared() async {
     final SharedPreferences preferences = await SharedPreferences.getInstance();
     String nom = preferences.getString('name') ?? '';
     String email = preferences.getString('email') ?? '';
     String password = preferences.getString('password') ?? '';
     String accessToken = preferences.getString('accessToken') ?? '';
+    // ignore: avoid_print
     print('AccessToken récupéré: $accessToken');
     return User(nom, email, password, accessToken);
   }
