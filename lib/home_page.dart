@@ -172,7 +172,7 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text("Paramètres"),
-              onTap: () => context.go("/"),
+              onTap: () => context.go("/parametre"),
             ),
             ListTile(
               leading: const Icon(Icons.logout),
@@ -214,7 +214,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 16),
-            // Liste des tâches
             Expanded(
               child: ListView.builder(
                 itemCount: tasks.length,

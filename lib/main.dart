@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:todo_list_mo/connection.dart';
 import 'package:todo_list_mo/home_page.dart';
+import 'package:todo_list_mo/parametre.dart';
 import 'package:todo_list_mo/signup.dart';
 import 'package:todo_list_mo/welcome.dart';
 
@@ -30,6 +31,12 @@ final GoRouter _router = GoRouter(
           path: 'homePage',
           builder: (BuildContext context, GoRouterState state) {
             return const HomePage();
+          },
+        ),
+        GoRoute(
+          path: 'parametre',
+          builder: (BuildContext context, GoRouterState state) {
+            return const Parametre();
           },
         ),
       ],
