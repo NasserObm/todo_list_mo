@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todo_list_mo/connection.dart';
 import 'package:todo_list_mo/user.dart';
 import 'package:http/http.dart' as http;
 
@@ -19,7 +18,6 @@ class _HomePageState extends State<HomePage> {
   User user = User('', '', '', '');
   List<Map<String, dynamic>> tasks = [];
   final TextEditingController _taskController = TextEditingController();
-  bool isAddingTask = false;
   String? editingTaskId;
 
   @override
@@ -30,8 +28,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadUserData() async {
     user = await getShared();
-    setState(() {}); // Rafraîchir pour afficher les données utilisateur
-    await _fetchTasks(); // Charger les tâches après récupération du token
+    setState(() {});
+    await _fetchTasks();
   }
 
   Future<User> getShared() async {
@@ -97,7 +95,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _updateTask(String taskId, String newContent) async {
-    print(taskId);
     final url = Uri.parse(
         'https://todolist-api-production-1e59.up.railway.app/task/$taskId');
     final body = jsonEncode({'contenu': newContent});
@@ -108,8 +105,6 @@ class _HomePageState extends State<HomePage> {
     }
 
     try {
-      print("Mise à jour de la tâche ID: $taskId avec contenu: $newContent");
-
       final response = await http.put(url,
           headers: {
             'Content-Type': 'application/json',
@@ -119,7 +114,6 @@ class _HomePageState extends State<HomePage> {
 
       if (response.statusCode == 200) {
         _fetchTasks();
-        print("Tâche mise à jour avec succès !");
         setState(() {
           editingTaskId = null;
           _taskController.clear();
@@ -192,7 +186,6 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Formulaire pour ajouter une tâche
             TextField(
               controller: _taskController,
               decoration: const InputDecoration(
@@ -203,7 +196,11 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                _addTask(_taskController.text);
+                if (editingTaskId != null) {
+                  _updateTask(editingTaskId!, _taskController.text);
+                } else {
+                  _addTask(_taskController.text);
+                }
               },
               style: ElevatedButton.styleFrom(
                   padding:
@@ -211,9 +208,9 @@ class _HomePageState extends State<HomePage> {
                   backgroundColor: const Color(0xffba7264),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5))),
-              child: const Text(
-                'Enregistrer',
-                style: TextStyle(color: Color(0xffffffff), fontSize: 30),
+              child: Text(
+                editingTaskId != null ? 'Mettre à jour' : 'Enregistrer',
+                style: const TextStyle(color: Color(0xffffffff), fontSize: 30),
               ),
             ),
             const SizedBox(height: 16),
@@ -241,8 +238,12 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.edit),
-                            onPressed: () =>
-                                _updateTask(task['id'], 'Nouveau Nom de Tâche'),
+                            onPressed: () {
+                              setState(() {
+                                editingTaskId = task['id'];
+                                _taskController.text = task['contenu'] ?? '';
+                              });
+                            },
                           ),
                           IconButton(
                             icon: const Icon(Icons.delete),
@@ -250,10 +251,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                      onTap: () {
-                        _taskController.text = task['contenu'] ?? '';
-                        _updateTask(task['id'], _taskController.text);
-                      },
                     ),
                   );
                 },
